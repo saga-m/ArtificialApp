@@ -22,12 +22,23 @@ class AppImages {
   static const String whatsapp = "assets/icon/whatsapp.png";
   static const String you_tube = "assets/icon/you_tube.png";
   static const String Detals = "assets/icon/detals.png";
-  // svg
-  static const String vodafonCash = "assets/icon/vodafoneCash.svg";
-  static const String InstaPay = "assets/icon/instaPay.svg";
-  static const String UpgradeProfile = "assets/icon/profile.svg";
-  static const String ad = "assets/icon/ad.svg";
-  static const String ad2 = "assets/icon/ad2.svg";
+  static const String vodafonCash = "assets/icon/vodafoneCash.png";
+  static const String InstaPay = "assets/icon/instaPay.png";
+  static const String UpgradeProfile = "assets/icon/upgrade_profile.png";
+  static const String ad = "assets/icon/ad.png";
+  static const String ad2 = "assets/icon/ad2.png";
+
+  // search
+  static const String all = "assets/icon/all.png";
+  static const String ceramic = "assets/icon/ceramic.png";
+  static const String HVAC_Technician = "assets/icon/HVAC_Technician.png";
+  static const String carpenter = "assets/icon/carpenter.png";
+  static const String blacksmith = "assets/icon/blacksmith.png";
+  static const String electrician = "assets/icon/electrician.png";
+  static const String glass = "assets/icon/glass.png";
+  static const String plumber = "assets/icon/plumber.png";
+  static const String painter = "assets/icon/painter.png";
+  static const String builder = "assets/icon/builder.png";
 }
 
 class AppColors {

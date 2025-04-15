@@ -1,5 +1,7 @@
-import 'package:artificial/assets.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:artificial/ui/screen/Fav/Favorites_Provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class WorkerCard extends StatelessWidget {
   final String image;
@@ -19,76 +21,107 @@ class WorkerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(12),
-      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      decoration: BoxDecoration(
-        color: Color(0xff1C1C1C),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 30,
-            backgroundImage: AssetImage(image),
+    var favoritesProvider = Provider.of<FavoritesProvider>(context);
+    bool isFavorite =
+        favoritesProvider.favorites.any((worker) => worker['name'] == name);
+
+    return Stack(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(12),
+          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+          decoration: BoxDecoration(
+            color: const Color(0xff1C1C1C),
+            borderRadius: BorderRadius.circular(8),
           ),
-          SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  name,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 30,
+                backgroundImage: AssetImage(image),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      profession,
+                      style: TextStyle(
+                        color: Colors.grey[400],
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: List.generate(
+                        5,
+                        (index) => Icon(
+                          Icons.star,
+                          color: index < rating ? Colors.amber : Colors.grey,
+                          size: 18,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(height: 4),
-                Text(
-                  profession,
-                  style: TextStyle(
-                    color: Colors.grey[400],
-                    fontSize: 14,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Row(
-                  children: List.generate(
-                    5,
-                    (index) => Icon(
-                      Icons.star,
-                      color:
-                          index < rating ? AppColors.primaryGold : Colors.grey,
-                      size: 18,
+              ),
+              Column(
+                children: [
+                  ElevatedButton(
+                    onPressed: onOrderPressed,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.amber,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                    ),
+                    child: Text(
+                      AppLocalizations.of(context)!.order_now,
+                      style: TextStyle(
+                          color: Colors.black, fontWeight: FontWeight.bold),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ),
-          Column(
-            children: [
-              ElevatedButton(
-                onPressed: onOrderPressed, // ✅ استخدام الدالة الصحيحة
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryGold,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                ),
-                child: Text(
-                  "اطلب الآن",
-                  style: TextStyle(
-                      color: Colors.black, fontWeight: FontWeight.bold),
-                ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
+        ),
+        Positioned(
+          top: 8,
+          right: 8,
+          child: GestureDetector(
+            onTap: () {
+              if (isFavorite) {
+                favoritesProvider.removeFromFavorites(name);
+              } else {
+                favoritesProvider.addToFavorites({
+                  'image': image,
+                  'name': name,
+                  'profession': profession,
+                  'rating': rating,
+                });
+              }
+            },
+            child: Icon(
+              isFavorite ? Icons.favorite : Icons.favorite_border,
+              color: isFavorite ? Colors.red : Colors.white,
+              size: 28,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

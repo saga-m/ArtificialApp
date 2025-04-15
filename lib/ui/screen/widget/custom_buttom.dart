@@ -5,10 +5,10 @@ class CustomButton extends StatelessWidget {
   final String text;
   final IconData? icon;
   final VoidCallback onPressed;
-  final Color? backgroundColor; // لون الخلفية
-  final Color? textColor; // لون النص
+  final Color? backgroundColor;
+  final Color? textColor;
 
-  final double? fontSize; // حجم الخط
+  final double? fontSize;
 
   const CustomButton({
     super.key,
@@ -44,7 +44,7 @@ class CustomButton extends StatelessWidget {
             Text(
               text,
               style: TextStyle(
-                fontSize: fontSize, // التحكم في حجم الخط
+                fontSize: fontSize,
                 fontWeight: FontWeight.bold,
                 color: textColor ?? AppColors.primaryGold,
               ),

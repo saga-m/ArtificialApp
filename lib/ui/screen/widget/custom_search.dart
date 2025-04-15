@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class CustomSearchBar extends StatelessWidget {
   final TextEditingController controller;
@@ -15,16 +16,16 @@ class CustomSearchBar extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 15),
       decoration: BoxDecoration(
-        color: Colors.black, // لون الخلفية
-        borderRadius: BorderRadius.circular(25), // تدوير الزوايا
-        border: Border.all(color: Colors.white, width: 2), //  إضافة إطار أبيض
+        color: Colors.black,
+        borderRadius: BorderRadius.circular(25),
+        border: Border.all(color: Colors.white, width: 2),
       ),
       child: TextField(
         controller: controller,
-        onSubmitted: onSearch, // يتم استدعاؤه عند الضغط على "إدخال"
+        onSubmitted: onSearch,
         style: TextStyle(color: Colors.white, fontSize: 18),
         decoration: InputDecoration(
-          hintText: "ابحث عن صنايعي الآن",
+          hintText: AppLocalizations.of(context)!.find_an_industrialist_now,
           hintStyle: TextStyle(color: Colors.yellow, fontSize: 16),
           border: InputBorder.none,
           prefixIcon: Icon(Icons.search, color: Colors.white),

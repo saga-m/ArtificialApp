@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:artificial/assets.dart';
-import 'package:artificial/ui/screen/widget/custom_buttom.dart';
 
-// ويدجت مخصصة لحقل إدخال النص
 class CustomTextField extends StatelessWidget {
   final String label;
   final TextInputType? keyboardType;
   final List<String>? dropdownItems;
   final ValueChanged<String?>? onChanged;
+  final double? dropdownMaxHeight;
 
   const CustomTextField({
     super.key,
@@ -15,6 +13,7 @@ class CustomTextField extends StatelessWidget {
     this.keyboardType,
     this.dropdownItems,
     this.onChanged,
+    this.dropdownMaxHeight,
   });
 
   @override
@@ -35,14 +34,25 @@ class CustomTextField extends StatelessWidget {
                   borderSide: BorderSide(color: Colors.white, width: 2.0),
                 ),
                 labelStyle: TextStyle(color: Colors.white),
+                filled: true,
+                fillColor: Colors.grey[900],
               ),
               dropdownColor: Colors.black,
               style: TextStyle(color: Colors.white),
+              isExpanded: true,
+              icon: Icon(Icons.arrow_drop_down, color: Colors.white),
               items: dropdownItems!
                   .map((item) =>
                       DropdownMenuItem(value: item, child: Text(item)))
                   .toList(),
               onChanged: onChanged,
+              selectedItemBuilder: (context) => dropdownItems!
+                  .map((item) => Text(
+                        item,
+                        style: TextStyle(color: Colors.white),
+                      ))
+                  .toList(),
+              menuMaxHeight: dropdownMaxHeight ?? 200,
             )
           : TextField(
               decoration: InputDecoration(

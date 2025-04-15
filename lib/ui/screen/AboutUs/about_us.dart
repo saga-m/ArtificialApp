@@ -1,14 +1,24 @@
+import 'package:artificial/assets.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AboutUsScreen extends StatelessWidget {
   static const String routeName = '/about-us';
 
+  void _launchURL(String url) async {
+    final uri = Uri.parse(url);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      throw 'Could not launch $url';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.primaryGrey,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: AppColors.primaryGrey,
         elevation: 0,
         automaticallyImplyLeading: false,
         actions: [
@@ -23,10 +33,10 @@ class AboutUsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "من نحن",
+            Text(
+              AppLocalizations.of(context)!.who_we_are,
               style: TextStyle(
-                color: Colors.yellow,
+                color: AppColors.primaryGold,
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
               ),
@@ -34,8 +44,8 @@ class AboutUsScreen extends StatelessWidget {
             const SizedBox(height: 10),
             const Divider(color: Colors.white24),
             const SizedBox(height: 10),
-            const Text(
-              "نحن في تطبيق صنايعي نسعى إلى تبسيط حياتك اليومية من خلال توفير منصة تجمع بين العملاء وأمهر الحرفيين والصنايعية في مكان واحد.",
+            Text(
+              AppLocalizations.of(context)!.about_one,
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 14,
@@ -43,8 +53,8 @@ class AboutUsScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10),
-            const Text(
-              "هدفنا هو تسهيل الوصول إلى خدمات الصيانة والإصلاح والتجديد بكل سرعة وسهولة، حيث يمكنك العثور على الصنايعي المناسب في الوقت والمكان الذي تحتاج إليه، بضغطة زر.",
+            Text(
+              AppLocalizations.of(context)!.about_two,
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 14,
@@ -52,8 +62,8 @@ class AboutUsScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10),
-            const Text(
-              "صنايعي هو الحل الأمثل لكل من يبحث عن الجودة والاحترافية في التعامل، مع نظام تقييم ومراجعات يضمن لك الثقة والشفافية.",
+            Text(
+              AppLocalizations.of(context)!.about_three,
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 14,
@@ -61,8 +71,8 @@ class AboutUsScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10),
-            const Text(
-              "نحن ملتزمون بتقديم تجربة استثنائية تجعل التواصل بين العميل والصنايعي أسرع وأكثر كفاءة من أي وقت مضى.",
+            Text(
+              AppLocalizations.of(context)!.about_four,
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 14,
@@ -70,8 +80,8 @@ class AboutUsScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10),
-            const Text(
-              "انضم إلينا الآن ووعدنا نساعدك على إنجاز كل ما تحتاجه بسهولة!",
+            Text(
+              AppLocalizations.of(context)!.about_five,
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 14,
@@ -86,12 +96,20 @@ class AboutUsScreen extends StatelessWidget {
                 IconButton(
                   icon:
                       const Icon(Icons.facebook, color: Colors.white, size: 30),
-                  onPressed: () {},
+                  onPressed: () =>
+                      _launchURL("https://www.facebook.com/YOUR_PAGE"),
                 ),
                 const SizedBox(width: 20),
                 IconButton(
                   icon: const Icon(Icons.mail, color: Colors.white, size: 30),
-                  onPressed: () {},
+                  onPressed: () => _launchURL("mailto:your_email@gmail.com"),
+                ),
+                const SizedBox(width: 20),
+                IconButton(
+                  icon: const Icon(Icons.ondemand_video,
+                      color: Colors.white, size: 30),
+                  onPressed: () => _launchURL(
+                      "https://www.youtube.com/channel/YOUR_CHANNEL_ID"),
                 ),
               ],
             ),

@@ -1,20 +1,28 @@
 import 'package:artificial/assets.dart';
-import 'package:artificial/ui/Tab/Calender/calender_tap.dart';
-import 'package:artificial/ui/Tab/Chat/chat_tap.dart';
-import 'package:artificial/ui/Tab/Detals/detals_tap.dart';
-import 'package:artificial/ui/Tab/Home/home_tap.dart';
-import 'package:artificial/ui/Tab/Home/order_card.dart';
-import 'package:artificial/ui/Tab/Profile/profile_tap.dart';
+import 'package:artificial/ui/Tap/Calender/calender_tap.dart';
+import 'package:artificial/ui/Tap/Chat/chat_tap.dart';
+import 'package:artificial/ui/Tap/Detals/detals_tap.dart';
+import 'package:artificial/ui/Tap/Home/home_tap.dart';
+import 'package:artificial/ui/screen/Order/order_card.dart';
+import 'package:artificial/ui/Tap/Profile/profile_tap.dart';
 import 'package:artificial/ui/screen/AboutUs/about_us.dart';
 import 'package:artificial/ui/screen/ContactUs/contact_screen.dart';
+import 'package:artificial/ui/screen/Fav/fav_screen.dart';
 import 'package:artificial/ui/screen/Upgrade/upgrade_screen.dart';
 import 'package:artificial/ui/screen/profile/profile_screen.dart';
+import 'package:artificial/ui/screen/setting/setting.dart';
+import 'package:artificial/ui/screen/widget/SearchResultsScreen.dart';
 import 'package:artificial/ui/screen/widget/custom_search.dart';
 import 'package:artificial/ui/screen/widget/navigation_buttom.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatefulWidget {
   static const String routeName = "home";
+  bool isSearching = false;
+  final int? initialTabIndex;
+  HomeScreen({this.initialTabIndex});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -26,10 +34,29 @@ class _HomeScreenState extends State<HomeScreen> {
   Map<String, dynamic>? selectedWorker;
   late TextEditingController searchController;
 
+  bool isSearching = false;
+
   @override
   void initState() {
     super.initState();
     searchController = TextEditingController();
+    searchController.addListener(() {
+      setState(() {
+        isSearching = searchController.text.isNotEmpty;
+      });
+    });
+    if (widget.initialTabIndex != null) {
+      selectedIndex = widget.initialTabIndex!;
+    }
+  }
+
+  Future<void> _launchURL(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 
   @override
@@ -38,30 +65,40 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
+  void openSearchScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => SearchResultsScreen(
+                query: searchController.text,
+              )),
+    );
+  }
+
   void openOrderCard(Map<String, dynamic> worker) async {
-    final selectedWorker = await Navigator.push(
+    final result = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => OrderCard(workerData: worker)),
     );
 
-    if (selectedWorker != null) {
-      setState(() {
-        this.selectedWorker = selectedWorker;
-        selectedIndex = 4;
-      });
+    if (result != null) {
+      if (result is Map<String, dynamic> && result.containsKey("tabIndex")) {
+        setState(() {
+          selectedIndex = result["tabIndex"];
+        });
+      } else if (result is Map<String, dynamic>) {
+        setState(() {
+          selectedWorker = result;
+          selectedIndex = 2; // ← ده مهم يوديك على ChatTap
+        });
+      }
     }
-  }
-
-  void selectWorker(Map<String, dynamic> worker) {
-    setState(() {
-      selectedWorker = worker;
-      selectedIndex = 4;
-    });
   }
 
   void onTabChange(int index) {
     setState(() {
       selectedIndex = index;
+      isSearching = false;
     });
   }
 
@@ -73,7 +110,10 @@ class _HomeScreenState extends State<HomeScreen> {
         onWorkerSelected: openOrderCard,
       ),
       DetalsTap(),
-      ChatTap(),
+      ChatTap(
+        workerName: selectedWorker?["name"] ?? "بدون اسم",
+        workerImage: selectedWorker?["image"] ?? AppImages.User,
+      ),
       ProfileTap(workerData: selectedWorker),
       CalenderTap(),
     ];
@@ -81,6 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return SafeArea(
       child: Scaffold(
         key: scaffoldKey,
+        resizeToAvoidBottomInset: false,
         extendBodyBehindAppBar: true,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
@@ -132,12 +173,18 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: CustomSearchBar(
                       controller: searchController,
                       onSearch: (query) {
-                        print("تم البحث عن: $query");
+                        setState(() {
+                          isSearching = query.isNotEmpty;
+                        });
                       },
                     ),
                   ),
                 const SizedBox(height: 50),
-                Expanded(child: tabs[selectedIndex]),
+                Expanded(
+                  child: isSearching
+                      ? SearchResultsScreen(query: searchController.text)
+                      : _getSelectedScreen(),
+                ),
               ],
             ),
           ],
@@ -148,6 +195,20 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
+  }
+
+  Widget _getSelectedScreen() {
+    List<Widget> tabs = [
+      HomeTap(onTabChanged: onTabChange, onWorkerSelected: openOrderCard),
+      DetalsTap(),
+      ChatTap(
+        workerName: selectedWorker?["name"] ?? "No Name",
+        workerImage: selectedWorker?["image"] ?? AppImages.work,
+      ),
+      ProfileTap(workerData: selectedWorker),
+      CalenderTap(),
+    ];
+    return tabs[selectedIndex];
   }
 
   Widget _buildDrawer() {
@@ -174,29 +235,57 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _drawerItem(Icons.workspace_premium, "ترقيه الحساب", () {
+                _drawerItem(Icons.workspace_premium,
+                    AppLocalizations.of(context)!.upgrade_account, () {
                   Navigator.pushNamed(context, UpgradeScreen.routeName);
                 }),
-                _drawerItem(Icons.favorite, "المفضله", () {}),
-                _drawerItem(Icons.phone, "تواصل معانا", () {
+                _drawerItem(
+                    Icons.favorite, AppLocalizations.of(context)!.favorites,
+                    () {
+                  Navigator.pushNamed(context, FavScreen.routeName);
+                }),
+                _drawerItem(
+                    Icons.phone, AppLocalizations.of(context)!.conuct_us, () {
                   Navigator.pushNamed(context, ContactScreen.routeName);
                 }),
-                _drawerItem(Icons.info, "عنا", () {
+                _drawerItem(Icons.info, AppLocalizations.of(context)!.about_us,
+                    () {
                   Navigator.pushNamed(context, AboutUsScreen.routeName);
                 }),
-                _drawerItem(Icons.settings, "الإعدادات", () {}),
+                _drawerItem(
+                    Icons.settings, AppLocalizations.of(context)!.settings, () {
+                  Navigator.pushNamed(context, SettingScreen.routeName);
+                }),
               ],
             ),
           ),
-          const Spacer(),
+          Spacer(),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            padding: const EdgeInsets.only(bottom: 20),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _socialButton(icon: Icons.mail),
-                _socialButton(icon: Icons.facebook),
-                _socialButton(imagePath: "assets/icon/youtube.png"),
+                IconButton(
+                  icon: Icon(Icons.facebook, color: Colors.white, size: 30),
+                  onPressed: () {
+                    _launchURL("https://www.facebook.com/");
+                  },
+                ),
+                SizedBox(width: 20),
+                IconButton(
+                  icon: Icon(Icons.mail, color: Colors.white, size: 30),
+                  onPressed: () {
+                    _launchURL("mailto:something@gmail.com");
+                  },
+                ),
+                SizedBox(width: 20),
+                IconButton(
+                  icon:
+                      Icon(Icons.ondemand_video, color: Colors.white, size: 30),
+                  onPressed: () {
+                    _launchURL("https://www.youtube.com/");
+                  },
+                ),
               ],
             ),
           ),
@@ -206,32 +295,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _drawerItem(IconData icon, String text, VoidCallback onTap) {
-    return InkWell(
+    return ListTile(
+      leading: Icon(icon, color: Colors.white),
+      title: Text(text, style: TextStyle(color: Colors.white, fontSize: 18)),
       onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        child: Row(
-          children: [
-            Icon(icon, color: Colors.white, size: 26),
-            const SizedBox(width: 10),
-            Text(text,
-                style: const TextStyle(color: Colors.white, fontSize: 18)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _socialButton({IconData? icon, String? imagePath}) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Colors.white.withOpacity(0.2),
-      ),
-      child: imagePath != null
-          ? Image.asset(imagePath, width: 24, height: 24)
-          : Icon(icon, color: Colors.white, size: 24),
     );
   }
 }

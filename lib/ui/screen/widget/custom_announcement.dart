@@ -8,7 +8,7 @@ class AdsSlider extends StatefulWidget {
 
 class _AdsSliderState extends State<AdsSlider> {
   final PageController _pageController = PageController();
-  int _currentIndex = 0; // لتتبع الفهرس الحالي
+  int _currentIndex = 0;
 
   final List<String> adsImages = [
     AppImages.an1,
@@ -21,11 +21,11 @@ class _AdsSliderState extends State<AdsSlider> {
     return Column(
       children: [
         Container(
-          height: 200, // ارتفاع الإعلان
+          height: 200,
           child: PageView.builder(
             controller: _pageController,
             itemCount: adsImages.length,
-            scrollDirection: Axis.horizontal, // تمرير أفقي
+            scrollDirection: Axis.horizontal,
             onPageChanged: (index) {
               setState(() {
                 _currentIndex = index;
@@ -35,17 +35,17 @@ class _AdsSliderState extends State<AdsSlider> {
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(15), // تدوير الزوايا
+                  borderRadius: BorderRadius.circular(15),
                   child: Image.asset(
                     adsImages[index],
-                    fit: BoxFit.cover, // تغطية الصورة بالكامل
+                    fit: BoxFit.cover,
                   ),
                 ),
               );
             },
           ),
         ),
-        const SizedBox(height: 10), // مسافة بين الصورة والمؤشرات
+        const SizedBox(height: 10),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(adsImages.length, (index) {

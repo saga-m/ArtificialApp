@@ -1,5 +1,6 @@
 import 'package:artificial/assets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class BottomNav extends StatelessWidget {
   final int currentIndex;
@@ -29,21 +30,23 @@ class BottomNav extends StatelessWidget {
         items: [
           _buildNavItem(
               icon: Icons.home,
-              label: 'الرئيسية',
+              label: AppLocalizations.of(context)!.home,
               isSelected: currentIndex == 0),
           _buildNavItemWithImage(
               imagePath: AppImages.Detals,
-              label: 'طلبات مفصلة',
+              label: AppLocalizations.of(context)!.detailed_requests,
               isSelected: currentIndex == 1),
           _buildNavItem(
-              icon: Icons.chat, label: 'دردشات', isSelected: currentIndex == 2),
+              icon: Icons.chat,
+              label: AppLocalizations.of(context)!.chats,
+              isSelected: currentIndex == 2),
           _buildNavItem(
               icon: Icons.person,
-              label: 'الملف الشخصي',
+              label: AppLocalizations.of(context)!.profile,
               isSelected: currentIndex == 3),
           _buildNavItem(
               icon: Icons.calendar_today,
-              label: 'التقويم',
+              label: AppLocalizations.of(context)!.calender,
               isSelected: currentIndex == 4),
         ],
       ),

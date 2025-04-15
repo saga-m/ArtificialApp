@@ -1,6 +1,7 @@
 import 'package:artificial/assets.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+// import 'package:flutter_svg/flutter_svg.dart';
 
 class UpgradeScreen extends StatefulWidget {
   static const String routeName = '/upgrade-screen';
@@ -13,7 +14,6 @@ class _UpgradeScreenState extends State<UpgradeScreen> {
   String? selectedPlan;
   String subscriptionType = "الاشتراك السنوي";
 
-  // أسعار الخطط
   final Map<String, int> yearlyPrices = {
     "الحساب البلاتينيوم": 100,
     "الحساب الذهبي": 80,
@@ -47,75 +47,66 @@ class _UpgradeScreenState extends State<UpgradeScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              "🌟 ترقية الحساب",
+              AppLocalizations.of(context)!.upgrade_account,
               style: TextStyle(
                   color: AppColors.primaryGold,
                   fontSize: 22,
                   fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              decoration: BoxDecoration(
-                color: Colors.grey[900],
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: DropdownButton<String>(
-                value: subscriptionType,
-                dropdownColor: Colors.black,
-                icon: Icon(Icons.arrow_drop_down, color: Colors.white),
-                isExpanded: true,
-                underline: SizedBox(),
-                style: TextStyle(color: Colors.white, fontSize: 16),
-                items:
-                    ["الاشتراك الشهري", "الاشتراك السنوي"].map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    subscriptionType = value!;
-                  });
-                },
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildSubscriptionOption(
+                    AppLocalizations.of(context)!.monthly_sub),
+                SizedBox(width: 10),
+                _buildSubscriptionOption(
+                    AppLocalizations.of(context)!.annual_sub),
+              ],
             ),
             SizedBox(height: 20),
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    _buildUpgradeCard("الحساب البلاتينيوم", Colors.purple, [
+                    _buildUpgradeCard(
+                        AppLocalizations.of(context)!.platinum_acco,
+                        Colors.purple,
+                        [
+                          {
+                            "text":
+                                AppLocalizations.of(context)!.feature_your_page,
+                            "icon": AppImages.UpgradeProfile
+                          },
+                          {
+                            "text":
+                                AppLocalizations.of(context)!.promote_your_ads,
+                            "icon": AppImages.ad2
+                          },
+                          {
+                            "text": AppLocalizations.of(context)!.remove_ads,
+                            "icon": AppImages.ad
+                          },
+                        ],
+                        textColor: Colors.white),
+                    _buildUpgradeCard(AppLocalizations.of(context)!.gold_acco,
+                        AppColors.primaryGold, [
                       {
-                        "text": "ضع صفحتك في الصفحة الرئيسية",
+                        "text": AppLocalizations.of(context)!.feature_your_page,
                         "icon": AppImages.UpgradeProfile
                       },
                       {
-                        "text": "ضع إعلاناتك في الصفحة الرئيسية",
-                        "icon": AppImages.ad2
-                      },
-                      {
-                        "text": "منع إعلانات داخل التطبيق",
-                        "icon": AppImages.ad
-                      },
-                    ]),
-                    _buildUpgradeCard("الحساب الذهبي", AppColors.primaryGold, [
-                      {
-                        "text": "ضع صفحتك في الصفحة الرئيسية",
-                        "icon": AppImages.UpgradeProfile
-                      },
-                      {
-                        "text": "منع إعلانات داخل التطبيق",
+                        "text": AppLocalizations.of(context)!.promote_your_ads,
                         "icon": AppImages.ad
                       },
                     ]),
                     _buildUpgradeCard(
-                        "الحساب الفضي",
+                        AppLocalizations.of(context)!.silver_acco,
                         Colors.white,
                         [
                           {
-                            "text": "ضع صفحتك في الصفحة الرئيسية",
+                            "text":
+                                AppLocalizations.of(context)!.feature_your_page,
                             "icon": AppImages.UpgradeProfile
                           },
                         ],
@@ -130,15 +121,44 @@ class _UpgradeScreenState extends State<UpgradeScreen> {
     );
   }
 
+  Widget _buildSubscriptionOption(String type) {
+    bool isSelected = subscriptionType == type;
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          subscriptionType = type;
+        });
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primaryGold : Colors.grey[900],
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isSelected ? Colors.white : Colors.transparent,
+            width: 2,
+          ),
+        ),
+        child: Text(
+          type,
+          style: TextStyle(
+            color: isSelected ? Colors.black : Colors.white,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildUpgradeCard(
       String title, Color color, List<Map<String, String>> features,
-      {Color textColor = Colors.white}) {
+      {Color textColor = Colors.black}) {
     bool isSelected = selectedPlan == title;
 
-    // تحديد السعر بناءً على نوع الاشتراك
-    int price = subscriptionType == "الاشتراك السنوي"
-        ? yearlyPrices[title]!
-        : monthlyPrices[title]!;
+    int price = subscriptionType == AppLocalizations.of(context)!.annual_sub
+        ? (yearlyPrices[title] ?? 0)
+        : (monthlyPrices[title] ?? 0);
 
     return GestureDetector(
       onTap: () {
@@ -168,11 +188,10 @@ class _UpgradeScreenState extends State<UpgradeScreen> {
               children: features.map((feature) {
                 return Row(
                   children: [
-                    SvgPicture.asset(
+                    Image.asset(
                       feature["icon"]!,
                       width: 25,
                       height: 25,
-                      colorFilter: ColorFilter.mode(textColor, BlendMode.srcIn),
                     ),
                     SizedBox(width: 8),
                     Text(feature["text"]!,
@@ -191,7 +210,7 @@ class _UpgradeScreenState extends State<UpgradeScreen> {
                       fontSize: 14,
                       fontStyle: FontStyle.italic)),
               SizedBox(height: 10),
-              Text("اختر طريقة الدفع",
+              Text(AppLocalizations.of(context)!.choose_payment,
                   style: TextStyle(
                       color: textColor,
                       fontSize: 16,
@@ -199,24 +218,25 @@ class _UpgradeScreenState extends State<UpgradeScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SvgPicture.asset("assets/images/instapay.svg", width: 40),
+                  Image.asset(AppImages.InstaPay, width: 40),
                   SizedBox(width: 10),
-                  SvgPicture.asset("assets/images/vodafone_cash.svg",
-                      width: 40),
+                  Image.asset(AppImages.vodafonCash, width: 40),
                 ],
               ),
               SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.black,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8)),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: Text("اشترك الآن"),
+              Center(
+                child: ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    child: Text(AppLocalizations.of(context)!.subscribe_now),
+                  ),
                 ),
               )
             ],
